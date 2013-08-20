@@ -60,6 +60,13 @@ int send_init(void)
 	if(zconf.cidr != '\0'){
 		log_info("send", "Processing CIDR %s",zconf.cidr);
 
+		char** cidrs_split = cidr_split(zconf.cidr, ",");
+
+	    for (int x = 0; x < 2; x++)
+	    {
+	        printf("%s\n", cidrs_split[x]);
+	    }
+
 		//Split the range and IP
 		char** range_split = cidr_split(zconf.cidr, "/");
 		char* range = range_split[1];
