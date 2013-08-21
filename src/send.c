@@ -60,52 +60,10 @@ int send_init(void)
 	if(zconf.cidr != '\0'){
 		log_info("send", "Processing CIDR %s",zconf.cidr);
 
-		char** cidrs_split = cidr_split(zconf.cidr, ",");
-
-	    for (int x = 0; x < 2; x++)
-	    {
-	        printf("%s\n", cidrs_split[x]);
-	    }
-
-		//Split the range and IP
-		char** range_split = cidr_split(zconf.cidr, "/");
-		char* range = range_split[1];
-		//Get IP split
-		char** split = cidr_split(range_split[0], ".");
 		
-		//Get start of CIDR
-		uint32_t result_first = (unsigned long) (atoll(split[0]) * 16777216) + (atoll(split[1]) * 65536) + (atoll(split[2]) * 256) + atoll(split[3]);
+		cidr_init(zconf.cidr);	
 
-		//Get end of CIDR
-		int number_of_ips = (pow(2,(32-atoll(range))) - 1);
-		uint32_t result_second = (unsigned long) result_first + number_of_ips;
-
-		cidr_init(result_first);
-
-		
-
-	  	uint8_t octet[4];
-	    int x;
-	    for (x = 0; x < 4; x++)
-	    {
-	        octet[x] = (result_first >> (x * 8)) & (uint8_t)-1;
-	    }
-		log_info("send"," First IP %d.%d.%d.%d", octet[3],octet[2],octet[1],octet[0]);
-
-	    for (x = 0; x < 4; x++)
-	    {
-	        octet[x] = (result_second >> (x * 8)) & (uint8_t)-1;
-	    }
-		log_info("send"," Last IP %d.%d.%d.%d", octet[3],octet[2],octet[1],octet[0]);
-
-		zsend.first_scanned = cidr_get_curr_ip();
-
-		//Convert to same format that will be used in the packet send.
-		uint32_t val = ((result_second << 8) & 0xFF00FF00 ) | ((result_second >> 8) & 0xFF00FF ); 
-		uint32_t _last = (val << 16) | (val >> 16);
-		zsend.last_to_scan = _last;
-
-
+	  
 	}
 	else{
 		// generate a new primitive root and starting position
@@ -325,7 +283,7 @@ int send_run(void)
 			// uint32_t val = zsend.first_scanned++;
 			curr = cidr_get_next_ip();
 
-			if (curr == zsend.last_to_scan) {
+			if (zsend.last_to_scan == 1) {
 				zsend.complete = 1;
 				zsend.finish = now();
 			}

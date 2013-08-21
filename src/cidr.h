@@ -11,7 +11,9 @@
 #ifndef _CIDR_H
 #define _CIDR_H
 
-int cidr_init(uint32_t);
+int cidr_init(char*);
+
+int process_cidr(char*);
 
 // get next IP address to scan
 uint32_t cidr_get_next_ip(void);
